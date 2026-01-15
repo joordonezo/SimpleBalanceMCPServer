@@ -1,23 +1,23 @@
-package com.app.simplebalancemcpserver.services;
+package com.app.simplebalancemcpserver;
 
 import com.app.simplebalancemcpserver.models.Transaction;
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
+import org.springaicommunity.mcp.annotation.McpTool;
+import org.springaicommunity.mcp.annotation.McpToolParam;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class TransactionService {
+public class TransactionTools {
 
     private final WebClient webClient;
 
-    @Tool(name = "find-all", description = "Find all Transactions")
+    @McpTool(name = "find-all", description = "Find all Transactions")
     public List<Transaction> findAllTransactions(){
         return webClient.get()
                 .uri("/list")
@@ -30,10 +30,10 @@ public class TransactionService {
 
     }
 
-    @Tool(name = "find-all-by-query", description = "Find all Transactions by queryString")
-    public List<Transaction> findAllTransactionByQueryString(@ToolParam(description = "queryString") String query){
+    @McpTool(name = "find-all-by-query", description = "Find all Transactions by queryString")
+    public List<Transaction> findAllTransactionByQueryString(@McpToolParam(description = "queryString") String queryString){
         return webClient.get()
-                .uri("/list/"+query)
+                .uri("/list/"+queryString)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError,
                         response -> Mono.error(new RuntimeException("Error 4xx")))
@@ -43,8 +43,8 @@ public class TransactionService {
 
     }
 
-    @Tool(name = "find-transaction-by-id", description = "Find a single transaction by id")
-    public Transaction findTransactionById(@ToolParam(description = "id") String id){
+    @McpTool(name = "find-transaction-by-id", description = "Find a single transaction by id")
+    public Transaction findTransactionById(@McpToolParam(description = "id") String id){
         return webClient.get()
                 .uri("/transaction/"+id)
                 .retrieve()
@@ -55,8 +55,8 @@ public class TransactionService {
 
     }
 
-    @Tool(name = "save-transaction", description = "Save a single transaction")
-    public Transaction saveTransaction(@ToolParam(description = "item") String item, @ToolParam(description = "value") Double value){
+    @McpTool(name = "save-transaction", description = "Save a single transaction")
+    public Transaction saveTransaction(@McpToolParam(description = "item") String item, @McpToolParam(description = "value") Double value){
         return webClient.post()
                 .uri("/transaction")
                 .bodyValue(new Transaction(null, item, value))
@@ -68,8 +68,8 @@ public class TransactionService {
 
     }
 
-    @Tool(name = "edit-transaction", description = "Edit a single transaction")
-    public Transaction editTransaction(@ToolParam(description = "id") String id, @ToolParam(description = "item") String item, @ToolParam(description = "value") Double value){
+    @McpTool(name = "edit-transaction", description = "Edit a single transaction")
+    public Transaction editTransaction(@McpToolParam(description = "id") String id, @McpToolParam(description = "item") String item, @McpToolParam(description = "value") Double value){
         return webClient.put()
                 .uri("/transaction")
                 .bodyValue(new Transaction(id, item, value))
@@ -81,8 +81,8 @@ public class TransactionService {
 
     }
 
-    @Tool(name = "delete-transaction", description = "Delete a single transaction")
-    public Transaction deleteTransaction(@ToolParam(description = "id") String id, @ToolParam(description = "item") String item, @ToolParam(description = "value") Double value){
+    @McpTool(name = "delete-transaction", description = "Delete a single transaction")
+    public Transaction deleteTransaction(@McpToolParam(description = "id") String id, @McpToolParam(description = "item") String item, @McpToolParam(description = "value") Double value){
         return webClient.delete()
                 .uri("/transaction")
                 //.bodyValue(transaction)
@@ -94,8 +94,8 @@ public class TransactionService {
 
     }
 
-    @Tool(name = "delete-transaction-by-id", description = "delete a single transaction by id")
-    public Transaction deleteTransactionById(@ToolParam(description = "id") String id){
+    @McpTool(name = "delete-transaction-by-id", description = "delete a single transaction by id")
+    public Transaction deleteTransactionById(@McpToolParam(description = "id") String id){
         return webClient.delete()
                 .uri("/transaction/"+id)
                 .retrieve()
